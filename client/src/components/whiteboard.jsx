@@ -36,7 +36,7 @@ export default function Whiteboard() {
     ctx.strokeStyle = "#000000";
     ctx.lineWidth = lineWidth;
 
-    // Fill background white (so exports don't become transparent)
+    // Fill background white
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, cssWidth, cssHeight);
 

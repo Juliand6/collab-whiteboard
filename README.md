@@ -1,7 +1,7 @@
 ## LearnSpace
 
 A full-stack, real-time collaborative whiteboard built for teachers, tutors, and students.
-Users can draw, erase, save boards, collaborate live, and export work — with optional subscription-based limits.
+Users can draw, erase, save boards, collaborate live, and export work — with optional subscription-based limits
 
 ## Frontend
 

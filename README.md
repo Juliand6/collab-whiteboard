@@ -1,9 +1,7 @@
-## Real-Time Collaborative Whiteboard
+## LearnSpace
 
 A full-stack, real-time collaborative whiteboard built for teachers, tutors, and students.
 Users can draw, erase, save boards, collaborate live, and export work — with optional subscription-based limits.
-
-This project is built incrementally, ensuring every phase results in a working, testable product.
 
 ## Frontend
 

@@ -1,15 +1,31 @@
-# Collab Whiteboard
+## Real-Time Collaborative Whiteboard
 
-## Run locally
+A full-stack, real-time collaborative whiteboard built for teachers, tutors, and students.
+Users can draw, erase, save boards, collaborate live, and export work — with optional subscription-based limits.
 
-### Server
+This project is built incrementally, ensuring every phase results in a working, testable product.
 
-cd server
-npm install
-npm run dev
+## Frontend
 
-### Client
+React (Vite)
 
-cd client
-npm install
-npm run dev
+HTML5 Canvas API
+
+Socket.IO Client
+
+jsPDF
+
+## Backend
+
+Node.js + Express
+
+Socket.IO
+
+PostgreSQL + Prisma
+(MongoDB + Mongoose is an acceptable alternative)
+
+## Auth & Payments
+
+JWT authentication
+
+Stripe subscriptions (Pro tier)

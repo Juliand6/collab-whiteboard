@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Whiteboard from "../components/whiteboard";
 import { createApi } from "../api";
 import { clearToken, getToken } from "../auth";
+import { io } from "socket.io-client";
+
 
 export default function BoardEditor() {
   const { id } = useParams();
@@ -15,6 +17,10 @@ export default function BoardEditor() {
   const [strokes, setStrokes] = useState([]);
   const [err, setErr] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const [externalCommand, setExternalCommand] = useState(null);
+  const socketRef = useRef(null);
+
 
   async function loadBoard() {
     setErr("");
@@ -50,6 +56,30 @@ export default function BoardEditor() {
       setSaving(false);
     }
   }
+  useEffect(() => {
+  if (!token) return;
+
+  const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3001");
+  socketRef.current = socket;
+
+  socket.emit("board:join", { boardId: id });
+
+  socket.on("stroke:add", ({ stroke }) => {
+    // tell Whiteboard to apply a remote stroke
+    setExternalCommand({ type: "addStroke", stroke, at: Date.now() });
+  });
+
+  socket.on("board:clear", () => {
+    setExternalCommand({ type: "clear", at: Date.now() });
+  });
+
+
+  return () => {
+    socket.disconnect();
+    socketRef.current = null;
+  };
+}, [id, token]);
+
 
   return (
     <div style={{ padding: 20 }}>
@@ -68,9 +98,18 @@ export default function BoardEditor() {
       {err && <p style={{ color: "red" }}>{err}</p>}
 
       <Whiteboard
-        initialStrokes={strokes}
-        onChange={setStrokes}
-      />
+  initialStrokes={strokes}
+  onChange={(newStrokes) => setStrokes(newStrokes)}
+  externalCommand={externalCommand}
+  onStrokeEnd={(stroke) => {
+    const s = socketRef.current;
+    if (s) s.emit("stroke:add", { boardId: id, stroke });
+  }}
+  onClear={() => {
+    const s = socketRef.current;
+    if (s) s.emit("board:clear", { boardId: id });
+  }}
+/>
     </div>
   );
 }

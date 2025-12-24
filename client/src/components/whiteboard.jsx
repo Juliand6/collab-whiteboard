@@ -48,7 +48,7 @@ function redrawAll(ctx, strokes, w, h) {
   for (const s of strokes) drawStroke(ctx, s);
 }
 
-export default function Whiteboard({ initialStrokes = [], onChange }) {
+export default function Whiteboard({ initialStrokes = [], onChange, onStrokeEnd, onClear, externalCommand }) {
   const canvasRef = useRef(null);
   const ctxRef = useRef(null);
 
@@ -92,6 +92,28 @@ export default function Whiteboard({ initialStrokes = [], onChange }) {
     redoRef.current = [];
     redrawAll(ctx, strokesRef.current, W, H);
   }, [initialStrokes]);
+
+  useEffect(() => {
+  const ctx = ctxRef.current;
+  if (!ctx || !externalCommand) return;
+
+  if (externalCommand.type === "addStroke") {
+    const stroke = externalCommand.stroke;
+    strokesRef.current = [...strokesRef.current, stroke];
+    redrawAll(ctx, strokesRef.current, W, H);
+    onChange?.(strokesRef.current);
+  }
+
+  if (externalCommand.type === "clear") {
+    fillWhite(ctx, W, H);
+    strokesRef.current = [];
+    currentStrokeRef.current = null;
+    lastPointRef.current = null;
+    onChange?.(strokesRef.current);
+  }
+
+}, [externalCommand]);
+
 
   function getPos(e) {
     const rect = canvasRef.current.getBoundingClientRect();
@@ -154,6 +176,8 @@ export default function Whiteboard({ initialStrokes = [], onChange }) {
     if (stroke && stroke.points.length > 0) {
       strokesRef.current = [...strokesRef.current, stroke];
       onChange?.(strokesRef.current);
+      onStrokeEnd?.(stroke);
+
     }
 
     currentStrokeRef.current = null;
@@ -174,6 +198,8 @@ export default function Whiteboard({ initialStrokes = [], onChange }) {
     lastPointRef.current = null;
 
     onChange?.(strokesRef.current);
+    onClear?.();
+
   }
 
   function undo() {
